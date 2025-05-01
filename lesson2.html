@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 2 — Увімкнення світлодіода</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-blue-50 font-sans">
+
+  <header class="bg-blue-600 text-white p-6 shadow">
+    <h1 class="text-2xl font-bold text-center">💡 Урок 2: Увімкнення світлодіода</h1>
+    <p class="text-center text-sm mt-2">Перший крок у роботі з GPIO</p>
+  </header>
+
+  <main class="max-w-3xl mx-auto mt-6 p-6 bg-white rounded-xl shadow-md">
+
+    <section class="mb-6">
+      <h2 class="text-xl font-semibold text-blue-700 mb-2">🧰 Що потрібно?</h2>
+      <ul class="list-disc pl-5">
+        <li>ESP32</li>
+        <li>Світлодіод</li>
+        <li>Резистор 220 Ом</li>
+        <li>Макетна плата та дроти</li>
+      </ul>
+    </section>
+
+    <section class="mb-6">
+      <h2 class="text-xl font-semibold text-blue-700 mb-2">📌 Схема підключення</h2>
+      <p>Підключіть анод світлодіода до GPIO 2 через резистор, а катод — до GND.</p>
+    </section>
+
+    <section class="mb-6">
+      <h2 class="text-xl font-semibold text-blue-700 mb-2">👨‍💻 Код</h2>
+      <pre class="bg-gray-100 p-4 rounded text-sm overflow-auto">
+from machine import Pin
+import time
+
+led = Pin(2, Pin.OUT)
+
+while True:
+    led.on()
+    time.sleep(1)
+    led.off()
+    time.sleep(1)
+      </pre>
+      <p class="mt-2">Світлодіод буде блимати кожну секунду.</p>
+    </section>
+
+    <div class="mt-8 text-center">
+      <a href="index.html" class="text-blue-600 hover:underline">← Назад до головної</a>
+    </div>
+
+  </main>
+
+  <footer class="text-center mt-10 p-4 text-sm text-gray-500">
+    &copy; 2025 Робототехніка 6 класу
+  </footer>
+
+</body>
+</html>
