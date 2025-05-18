@@ -27,18 +27,16 @@
 
     <section class="mb-6">
       <h2 class="text-xl font-semibold text-blue-700 mb-2">📌 Схема підключення</h2>
-      <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
-        <div class="flex-1">
-          <p>Підключіть анод світлодіода до GPIO 15, а катод — через резистор до GND.</p>
-        </div>
-        <img src="images/OneLed.png" alt="Схема підключення світлодіода до ESP32" class="w-56 rounded shadow">
+      <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+        <p class="md:w-1/2">Підключіть анод світлодіода до GPIO 15, а катод — через резистор до GND.</p>
+        <img src="images/OneLed.png" alt="Схема підключення світлодіода до ESP32" class="md:w-1/2 rounded shadow">
       </div>
     </section>
 
     <section class="mb-6">
       <h2 class="text-xl font-semibold text-blue-700 mb-2">👨‍💻 Код</h2>
-      <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
-      <pre class="bg-gray-100 p-4 rounded text-sm overflow-auto flex-1">
+      <div class="flex flex-col md:flex-row gap-4">
+      <pre class="bg-gray-100 p-4 rounded text-sm overflow-auto md:w-1/2">
   from machine import Pin
   from time import sleep
   led = Pin(15, Pin.OUT)
@@ -47,15 +45,15 @@
   sleep(5) # Затримка 5 секунд
   led.off() # Вимкнути світлодіод
       </pre>
-      <img src="images/led-on-5-off.gif" alt="Анімація вмикання та вимикання світлодіода" class="w-40 rounded shadow">
+      <img src="images/led-on-5-off.gif" alt="Анімація вмикання та вимикання світлодіода" class="md:w-1/2 rounded shadow">
       </div>
       <p class="mt-2">Цей код увімкне світлодіод, зачекає 5 секунд, а потім вимкне його.</p>
     </section>
 
     <section class="mb-6">
       <h2 class="text-xl font-semibold text-blue-700 mb-2">🔄 Код блимання світлодіода</h2>
-      <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
-      <pre class="bg-gray-100 p-4 rounded text-sm overflow-auto flex-1">
+      <div class="flex flex-col md:flex-row gap-4">
+      <pre class="bg-gray-100 p-4 rounded text-sm overflow-auto md:w-1/2">
 from machine import Pin
 from time import sleep
 led = Pin(15, Pin.OUT)
@@ -65,7 +63,7 @@ while True:
     led.off()  # Вимкнути світлодіод
     sleep(1)  # Затримка 1 секунда
       </pre>
-      <img src="images/led-on-off.gif" alt="Анімація вмикання та вимикання світлодіода" class="w-40 rounded shadow">
+      <img src="images/led-on-off.gif" alt="Анімація вмикання та вимикання світлодіода" class="md:w-1/2 rounded shadow">
       </div>
       <p class="mt-2">Цей код змусить світлодіод блимати з інтервалом 1 секунда.</p>
     </section>
