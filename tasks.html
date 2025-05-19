@@ -1,116 +1,49 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Інтерактивні практичні завдання</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Модальне вікно */
+    #modal {
+      display: none;
+      position: fixed;
+      z-index: 50;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+    }
+    #modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+    }
+    #modal .close-btn {
+      position: fixed;
+      top: 1rem;
+      right: 1.5rem;
+      font-size: 3rem;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      user-select: none;
+      z-index: 60;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
   <header class="bg-blue-600 text-white py-6 text-center shadow">
     <h1 class="text-3xl font-bold">📘 Інтерактивні практичні завдання</h1>
-    <p class="text-sm mt-2">Запиши послідовність команд які дозволять</p>
+    <p class="text-sm mt-2">Запиши послідовність команд які дозволять:</p>
   </header>
 
-  <main class="max-w-4xl mx-auto p-6">
-    <!-- Середній рівень -->
-    <section class="mb-10">
-      <h2 class="text-2xl font-semibold text-blue-700 mb-4">🟡 Easy</h2>
-      <ul class="space-y-4">
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Увімкнути/вимкнути 5-й згори зовнішній світлодіод</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Увімкнути/вимкнути 1-й згори зовнішній світлодіод</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Увімкнути/вимкнути 2-й і 3-й згори зовнішні світлодіоди одночасно</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Увімкнути/вимкнути 4-й і 7-й згори зовнішні світлодіоди одночасно</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-      </ul>
-    </section>
-
-    <!-- Достатній рівень -->
-    <section class="mb-10">
-      <h2 class="text-2xl font-semibold text-green-700 mb-4">🟢 Medium</h2>
-      <ul class="space-y-4">
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Створити ефект «біжучого вогника» (згори до низу)</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Створити ефект «біжучого вогника» (знизу до гори)</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Створити ефект «хвилі»</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Сценарій «новий рік» — складна комбінація вогнів</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Серво, що щосекунди рухається 0° ↔ 180°</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Повернути сервомотор у положення 90°</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-      </ul>
-    </section>
-
-    <!-- Високий рівень -->
-    <section class="mb-10">
-      <h2 class="text-2xl font-semibold text-red-700 mb-4">🔴 HARD</h2>
-      <ul class="space-y-4">
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Керування одним мотором — вперед/назад</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Рух за шаблоном: «вперед 2с → стоп 1с → назад 2с»</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-        <li>
-          <details class="bg-white rounded p-4 shadow">
-            <summary class="cursor-pointer font-medium">Керування роботизованою рукою (3 серво)</summary>
-            <textarea class="w-full mt-2 p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
-          </details>
-        </li>
-      </ul>
-    </section>
+  <main class="max-w-5xl mx-auto p-6">
+    <div id="tasks"></div>
 
     <div class="text-center mt-10">
       <a href="index.html" class="text-blue-600 hover:underline">← Назад до головної</a>
@@ -120,5 +53,87 @@
   <footer class="text-center mt-6 p-4 text-sm text-gray-500">
     &copy; 2025 Робототехніка. Колгатін Андрій Олександрович
   </footer>
+
+  <!-- Модальне вікно -->
+  <div id="modal" class="flex">
+    <span class="close-btn" id="modalClose">&times;</span>
+    <img id="modalImg" src="" alt="Велике зображення" />
+  </div>
+
+  <script>
+    const tasks = [
+      { level: '🟡 EASY', color: 'blue-700', items: [
+        { text: 'Увімкнути/вимкнути 5-й згори зовнішній світлодіод', img: 'images/Girland.png' },
+        { text: 'Увімкнути/вимкнути 1-й згори зовнішній світлодіод', img: 'images/Girland.png' },
+        { text: 'Увімкнути/вимкнути 2-й і 3-й згори зовнішні світлодіоди одночасно', img: 'images/Girland.png' },
+        { text: 'Увімкнути/вимкнути 4-й і 7-й згори зовнішні світлодіоди одночасно', img: 'images/Girland.png' }
+      ] },
+      { level: '🟢 MEDIUM', color: 'green-700', items: [
+        { text: 'Створити ефект «біжучого вогника» (згори до низу)', img: 'images/Girland.png' },
+        { text: 'Створити ефект «біжучого вогника» (знизу до гори)', img: 'images/Girland.png' },
+        { text: 'Створити ефект «хвилі»', img: 'images/Girland.png' },
+        { text: 'Сценарій «новий рік» — складна комбінація вогнів', img: 'images/Girland.png' },
+        { text: 'Серво, що щосекунди рухається 0° ↔ 180°', img: 'images/servo-circuit.png' },
+        { text: 'Повернути сервомотор у положення 90°', img: 'images/servo-circuit.png' }
+      ] },
+      { level: '🔴 HARD', color: 'red-700', items: [
+        { text: 'Керування одним мотором — вперед/назад', img: 'img/motor_forward_reverse.png' },
+        { text: 'Рух за шаблоном: «вперед 2с → стоп 1с → назад 2с»', img: 'img/motor_sequence.png' },
+        { text: 'Керування роботизованою рукою (3 серво)', img: 'img/robot_arm.png' }
+      ] }
+    ];
+
+    const tasksContainer = document.getElementById("tasks");
+
+    tasks.forEach(section => {
+      const sectionEl = document.createElement("section");
+      sectionEl.className = "mb-10";
+      sectionEl.innerHTML = `<h2 class="text-2xl font-semibold text-${section.color} mb-4">${section.level}</h2>`;
+
+      const ul = document.createElement("ul");
+      ul.className = "space-y-4";
+
+      section.items.forEach(task => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <details class="bg-white rounded p-4 shadow">
+            <summary class="cursor-pointer font-medium">${task.text}</summary>
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <textarea class="w-full p-2 border rounded h-32" placeholder="Введіть код тут..."></textarea>
+              <img src="${task.img}" alt="${task.text}" class="w-full border rounded hover:shadow-lg cursor-pointer" />
+            </div>
+          </details>
+        `;
+        ul.appendChild(li);
+      });
+
+      sectionEl.appendChild(ul);
+      tasksContainer.appendChild(sectionEl);
+    });
+
+    // Модальне вікно логіка
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modalImg');
+    const modalClose = document.getElementById('modalClose');
+
+    tasksContainer.addEventListener('click', e => {
+      if (e.target.tagName === 'IMG' && e.target.closest('details')) {
+        modalImg.src = e.target.src;
+        modal.style.display = 'flex';
+      }
+    });
+
+    modalClose.addEventListener('click', () => {
+      modal.style.display = 'none';
+      modalImg.src = '';
+    });
+
+    modal.addEventListener('click', e => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+        modalImg.src = '';
+      }
+    });
+  </script>
 </body>
 </html>
