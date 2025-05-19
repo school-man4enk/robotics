@@ -39,7 +39,17 @@
     <section class="mb-6">
       <h2 class="text-xl font-semibold text-blue-700 mb-2">🖼️ Опис ніжок ESP32</h2>
       <div class="flex flex-col items-center">
-        <img src="images/ESP32-Pinout.png" alt="Опис ніжок ESP32" class="w-full max-w-md rounded shadow mb-4">
+        <img id="esp32-img" src="images/ESP32-Pinout.png" alt="Опис ніжок ESP32" class="w-full max-w-md rounded shadow mb-4 cursor-zoom-in" style="transition: box-shadow 0.2s;">
+        <!-- Fullscreen Modal -->
+        <div id="img-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+          <img src="images/ESP32-Pinout.png" alt="Опис ніжок ESP32" class="max-h-[90vh] max-w-[90vw] rounded shadow-lg">
+        </div>
+        <script>
+          const img = document.getElementById('esp32-img');
+          const modal = document.getElementById('img-modal');
+          modal.addEventListener('click', () => modal.classList.add('hidden'));
+          img.addEventListener('click', () => modal.classList.remove('hidden'));
+        </script>
         <p class="text-gray-700 text-sm text-center">
           На зображенні показано розташування та призначення основних ніжок плати ESP32. Звертай увагу на підписи, щоб правильно підключати компоненти!
         </p>
