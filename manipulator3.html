@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Маніпулятор SG-90 — Інтерактивний код</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+
+  <script src="js/skulpt.min.js"></script>
+  <script src="js/skulpt-stdlib.js"></script>
+  
+  <style>
+    .code-overlay {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 300px;
+      max-height: 70vh;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: white;
+      font-family: 'Courier New', monospace;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    
+    .code-overlay.minimized {
+      width: 200px;
+      height: 60px;
+      max-height: 60px;
+    }
+    
+    .code-header {
+      padding: 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(30, 41, 59, 0.8);
+    }
+    
+    .code-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    
+    .minimize-btn {
+      background: rgba(148, 163, 184, 0.2);
+      border: none;
+      color: #cbd5e1;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    
+    .minimize-btn:hover {
+      background: rgba(148, 163, 184, 0.3);
+      color: white;
+    }
+    
+    .code-content {
+      padding: 3px;
+      transition: opacity 0.3s ease;
+    }
+    
+    .code-overlay.minimized .code-content {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .code-textarea {
+      width: 100%;
+      height: 200px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    
+    .code-textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .control-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 0px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.2s;
+      flex: 1;
+    }
+    
+    .btn-run {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+    }
+    
+    .btn-run:hover:not(:disabled) {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      transform: translateY(-1px);
+    }
+    
+    .btn-stop {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+    
+    .btn-stop:hover:not(:disabled) {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      transform: translateY(-1px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .output-panel {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+      height: 120px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+      color: #e2e8f0;
+      line-height: 1.4;
+    }
+    
+    .output-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .output-panel::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+    
+    .output-panel::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 3px;
+    }
+    
+    .scene-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    
+    .info-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: white;
+      padding: 16px;
+      font-size: 12px;
+      max-width: 300px;
+      z-index: 1000;
+    }
+    
+    .servo-status {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    
+    .servo-indicator {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 10px;
+      color: #93c5fd;
+    }
+  </style>
+</head>
+<body class="bg-black overflow-hidden" id="sceneContainer">
+
+  <!-- Плавающий редактор коду -->
+  <div id="code-overlay" class="code-overlay">
+    <div class="code-header">
+      <div class="code-title"><button class="minimize-btn"  onclick="goFullscreen()">💻</button></div>
+
+      <div class="control-buttons">
+        <button id="runBtn" class="btn btn-run" onclick="runUserCode()">▶️ </button>
+        <button id="stopBtn" class="btn btn-stop" onclick="stopExecution()" disabled>⏹️ </button>
+        
+      </div>
+      <button class="minimize-btn" onclick="toggleMinimize()">
+        <span id="minimize-icon">─</span>
+      </button>
+    </div>
+    
+    <div class="code-content">
+      <textarea id="code" class="code-textarea" placeholder="Введіть ваш MicroPython код тут...">
+#from machine import Pin, PWM  
+#from time import sleep
+
+servo = PWM(Pin(12), 50)
+
+for i in range(5):
+    servo.duty(20)   # 0°
+    sleep(0.5)
+    servo.duty(120)  # 180°
+    sleep(0.5)</textarea>
+
+      
+
+      <div id="output" class="output-panel"></div>
+    </div>
+  </div>
+
+  <!-- Інформаційна панель -->
+  <div class="info-panel">
+    <div style="font-weight: 600; margin-bottom: 8px;">🤖 Статус маніпулятора</div>
+    <div style="color: #94a3b8; font-size: 11px;">Керування камерою: WASD + миша</div>
+    <div class="servo-status">
+      <div class="servo-indicator" id="servo1-status">Servo 1: 0°</div>
+      <div class="servo-indicator" id="servo2-status">Servo 2: 0°</div>
+      <div class="servo-indicator" id="servo3-status">Servo 3: 0°</div>
+    </div>
+  </div>
+
+  <!-- A-Frame сцена -->
+  <div class="scene-container" >
+    <a-scene
+      background="color: linear-gradient(to bottom, #0f172a, #1e293b)"
+      embedded
+      vr-mode-ui="enabled: false"
+      class="w-full h-full">
+
+      <a-assets>
+                <!-- Посилання на GLB-модель -->
+                <a-asset-item id="platformModel" src="models/platform_centered.glb"></a-asset-item>
+                <a-asset-item id="servo1holder" src = "models/servo1holder_centered.glb"></a-asset-item>
+                <a-asset-item id="servo2holder" src = "models/servo2holder_centered.glb"></a-asset-item>
+                <a-asset-item id="servo3holder" src = "models/servo3holder_centered.glb"></a-asset-item>
+                <a-asset-item id="servo" src = "models/servo.glb"></a-asset-item>
+            </a-assets>
+
+	        <a-entity id="manipulator" position="0 -0.25 -0.5" rotation="0 -85 0" scale="3 3 3">
+	            <!-- Основа -->
+	            <!-- <a-box position="0 0.1 0" depth="0.5" height="0.2" width="0.5" color="#444"></a-box> -->
+	            <!-- Основа як GLB-модель -->
+	            <a-entity gltf-model="#platformModel" position="0 0 0" scale="0.001 0.001 0.001">
+	            </a-entity>
+	            
+	            <!-- Перше servo -->
+	            <a-entity id="lever1" position="0 0.014 0" rotation="0 0 0" 
+	            	animation__step1="property: rotation; to: 0 180 0; dur: 1000; startEvents: rot1"
+	            	animation__reset="property: rotation; to: 0 0 0; dur: 1000; startEvents: reset1">
+	                <a-entity gltf-model="#servo1holder" position="0 0 0" scale="0.001 0.001 0.001" >
+	            	</a-entity> 
+	            	<a-entity gltf-model="#servo" position="0 0.017 0" rotation="180 90 0" scale="0.001 0.001 0.001" >
+	            	</a-entity>
+
+            		<a-entity id="lever2" position="0 0.060 0" rotation="0 0 0" 
+	            	animation__step1="property: rotation; to: -180 0 0; dur: 1000; startEvents: rot2"
+	            	animation__reset="property: rotation; to: 0 0 0; dur: 1000; startEvents: reset2">
+		                <a-entity gltf-model="#servo2holder" position="0 0 0" scale="0.001 0.001 0.001" >
+		            	</a-entity> 
+		            	<a-entity gltf-model="#servo" position="-0.008 0 0" rotation="299 0 -90" scale="0.001 0.001 0.001" >
+		            	</a-entity>
+
+		            	<a-entity gltf-model="#servo" position="-0.008 -0.026 0.043" rotation="121 0 -90" scale="0.001 0.001 0.001" >
+			            </a-entity> 
+
+		            	<a-entity id="lever3" position="0.009 -0.030 0.048" rotation="0 0 0" 
+		            	animation__step1="property: rotation; to: 90 0 0; dur: 1000; startEvents: rot3"
+		            	animation__reset="property: rotation; to: -90 0 0; dur: 1000; startEvents: reset3">
+			                <a-entity gltf-model="#servo3holder" position="0 0 0" scale="0.001 0.001 0.001" >
+			            	</a-entity> 
+			            	
+			            	
+			            </a-entity>
+
+		            </a-entity>
+
+	            </a-entity>
+
+	        </a-entity>   
+
+      <!-- Підлога з сіткою -->
+      <a-plane position="0 -1 0" rotation="-90 0 0" width="10" height="10" 
+               material="color: #1e293b; opacity: 0.8; transparent: true"
+               geometry="primitive: plane; width: 10; height: 10; segmentsWidth: 20; segmentsHeight: 20"
+               wireframe="true">
+      </a-plane>
+
+      <!-- Освітлення -->
+      <a-light type="ambient" color="#404040" intensity="0.6"></a-light>
+      <a-light type="directional" position="3 5 3" color="#ffffff" intensity="1" 
+               light="castShadow: true; shadowMapWidth: 2048; shadowMapHeight: 2048"></a-light>
+      <a-light type="point" position="0 3 0" color="#3b82f6" intensity="0.3"></a-light>
+
+      <!-- Камера з контролем -->
+      
+      <a-entity camera 
+                position="0 0 0" 
+                rotation="0 0 0"
+                look-controls="pointerLockEnabled: true" 
+                wasd-controls="acceleration: 5; fly: true">
+        
+        <!-- Курсор -->
+        <a-cursor color="#3b82f6" 
+                  geometry="primitive: ring; radiusInner: 0.005; radiusOuter: 0.01"
+                  position="0 0 -0.5"
+                  material="shader: flat">
+        </a-cursor>
+      </a-entity>
+
+      <!-- Частинки для ефекту -->
+      <a-entity id="particles" position="0 3 -2">
+        <a-entity geometry="primitive: sphere; radius: 0.01" 
+                  material="color: #3b82f6; opacity: 0.6; transparent: true"
+                  animation="property: position; to: 0 -3 0; dur: 3000; loop: true; easing: easeInQuad"
+                  animation__2="property: material.opacity; to: 0; dur: 3000; loop: true">
+        </a-entity>
+      </a-entity>
+    </a-scene>
+  </div>
+
+  <script>
+    let isRunning = false;
+    let currentExecution = null;
+    let isMinimized = false;
+    let servoAngles = [0, 0, 0];
+
+    function goFullscreen() {
+      const container = document.querySelector('#sceneContainer');
+      if (container.requestFullscreen) {
+        container.requestFullscreen();
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+      }
+    }
+
+    function updateUI(running) {
+      isRunning = running;
+      document.getElementById('runBtn').disabled = running;
+      document.getElementById('stopBtn').disabled = !running;
+    }
+
+    function toggleMinimize() {
+      const overlay = document.getElementById('code-overlay');
+      const icon = document.getElementById('minimize-icon');
+      
+      isMinimized = !isMinimized;
+      
+      if (isMinimized) {
+        overlay.classList.add('minimized');
+        icon.textContent = '□';
+      } else {
+        overlay.classList.remove('minimized');
+        icon.textContent = '─';
+      }
+    }
+
+    function updateServoStatus(servoIndex, angle) {
+      servoAngles[servoIndex] = angle;
+      const statusEl = document.getElementById(`servo${servoIndex + 1}-status`);
+      statusEl.textContent = `Servo ${servoIndex + 1}: ${angle.toFixed(0)}°`;
+    }
+
+    function stopExecution() {
+      if (currentExecution) {
+        currentExecution.stopped = true;
+      }
+      updateUI(false);
+    }
+
+    function outputText(text) {
+      const output = document.getElementById('output');
+      output.textContent += text + '\n';
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function clearOutput() {
+      document.getElementById('output').textContent = '';
+    }
+
+    function animateServo(servo_pin, targetAngle, duration = 500) {
+      return new Promise((resolve) => {
+        if (currentExecution && currentExecution.stopped) {
+          resolve();
+          return;
+        }
+        
+        let lever;
+        let currentRotation;
+        let startAngle;
+        let servoIndex = 0;
+
+        if (servo_pin==12){
+        	lever = document.querySelector('#lever1');
+        	currentRotation = lever.getAttribute('rotation');
+        	startAngle = currentRotation.y;
+        	const angleDiff = targetAngle - startAngle;
+	        const startTime = Date.now();
+	        
+	        function animate() {
+	          if (currentExecution && currentExecution.stopped) {
+	            resolve();
+	            return;
+	          }
+	          
+	          const elapsed = Date.now() - startTime;
+	          const progress = Math.min(elapsed / duration, 1);
+	          
+	          // Easing function для плавної анімації
+	          const easeProgress = 1 - Math.pow(1 - progress, 3);
+	          const currentAngle = startAngle + (angleDiff * easeProgress);
+	          
+	          lever.setAttribute('rotation', `0 ${currentAngle} 0`);
+	          updateServoStatus(0,currentAngle);
+
+	          if (progress < 1) {
+	            requestAnimationFrame(animate);
+	          } else {
+	            resolve();
+	          }
+	        }
+	        
+	        animate();
+	    }
+		else if (servo_pin==13){
+        	lever = document.querySelector('#lever2');
+        	currentRotation = lever.getAttribute('rotation');
+        	startAngle = currentRotation.x;
+        	const angleDiff = -targetAngle - startAngle;
+	        const startTime = Date.now();
+	        
+	        function animate() {
+	          if (currentExecution && currentExecution.stopped) {
+	            resolve();
+	            return;
+	          }
+	          
+	          const elapsed = Date.now() - startTime;
+	          const progress = Math.min(elapsed / duration, 1);
+	          
+	          // Easing function для плавної анімації
+	          const easeProgress = 1 - Math.pow(1 - progress, 3);
+	          const currentAngle = startAngle + (angleDiff * easeProgress);
+	          
+	          lever.setAttribute('rotation', `${currentAngle} 0 0`);
+	          updateServoStatus(1,currentAngle);
+
+	          if (progress < 1) {
+	            requestAnimationFrame(animate);
+	          } else {
+	            resolve();
+	          }
+	        }
+	        
+	        animate();
+	    }
+        else if (servo_pin==14){
+        	lever = document.querySelector('#lever3');
+        	currentRotation = lever.getAttribute('rotation');
+        	startAngle = currentRotation.x;
+        	const angleDiff = (targetAngle-90) - startAngle;
+	        const startTime = Date.now();
+	        
+	        function animate() {
+	          if (currentExecution && currentExecution.stopped) {
+	            resolve();
+	            return;
+	          }
+	          
+	          const elapsed = Date.now() - startTime;
+	          const progress = Math.min(elapsed / duration, 1);
+	          
+	          // Easing function для плавної анімації
+	          const easeProgress = 1 - Math.pow(1 - progress, 3);
+	          const currentAngle = startAngle + (angleDiff * easeProgress);
+	          
+	          lever.setAttribute('rotation', `${currentAngle} 0 0`);
+	          updateServoStatus(2,currentAngle);
+	          
+	          if (progress < 1) {
+	            requestAnimationFrame(animate);
+	          } else {
+	            resolve();
+	          }
+	        }
+	        
+	        animate();
+	    }
+        else
+        	resolve();
+        	return;
+      });
+    }
+
+    // Конвертація duty значення (20-120) у кут (0-180°)
+    function dutyToAngle(duty) {
+      const clampedDuty = Math.max(20, Math.min(120, duty));
+      return ((clampedDuty - 20) / (120 - 20)) * 180;
+    }
+
+    async function runUserCode() {
+      if (isRunning) return;
+      
+      updateUI(true);
+      clearOutput();
+      
+      const code = document.getElementById('code').value;
+      currentExecution = { stopped: false };
+
+
+
+      // Налаштування Skulpt
+      Sk.configure({
+        output: outputText,
+        read: function(filename) {
+          if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][filename] === undefined)
+            throw "File not found: '" + filename + "'";
+          return Sk.builtinFiles["files"][filename];
+        },
+        execLimit: 50000,
+        syspath: [],
+        __future__: Sk.python3,
+        python3: true,
+        inputfun: () => '',
+        inputfunTakesPrompt: true
+      });
+
+      // Створюємо класи Pin та PWM безпосередньо
+      const PinClass = Sk.misceval.buildClass(new Sk.builtin.module(), function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self, pin_num, mode) {
+          self.pin_num = pin_num;
+          self.mode = mode;
+          return Sk.builtin.none.none$;
+        });
+      }, 'Pin', []);
+
+      const PWMClass = Sk.misceval.buildClass(new Sk.builtin.module(), function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self, pin, freq) {
+          self.pin = pin;
+          self.freq = freq || new Sk.builtin.int_(50);
+          const pinNum = Sk.ffi.remapToJs(pin.pin_num);
+          const freqVal = Sk.ffi.remapToJs(self.freq);
+          outputText(`PWM ініціалізовано на піні ${pinNum} з частотою ${freqVal} Hz`);
+          return Sk.builtin.none.none$;
+        });
+        
+        $loc.duty = new Sk.builtin.func(function(self, duty_value) {
+          const duty = Sk.ffi.remapToJs(duty_value);
+          const angle = dutyToAngle(duty);
+          
+          outputText(`Встановлено duty: ${duty} (кут: ${angle.toFixed(1)}°)`);
+          
+          return Sk.misceval.promiseToSuspension(
+            animateServo(Sk.ffi.remapToJs(self.pin.pin_num),angle).then(() => Sk.builtin.none.none$)
+          );
+        });
+        
+        $loc.freq = new Sk.builtin.func(function(self, freq_value) {
+          if (freq_value !== undefined) {
+            self.freq = freq_value;
+            outputText(`Частота встановлена: ${Sk.ffi.remapToJs(freq_value)} Hz`);
+          }
+          return self.freq;
+        });
+      }, 'PWM', []);
+
+      // Функція sleep
+      const sleepFunc = new Sk.builtin.func(function(seconds) {
+        const s = Sk.ffi.remapToJs(seconds);
+        const ms = Math.max(0, s * 1000);
+        
+        return Sk.misceval.promiseToSuspension(
+          new Promise(resolve => {
+            outputText(`Пауза ${s} сек...`);
+            setTimeout(() => {
+              if (!currentExecution || !currentExecution.stopped) {
+                resolve();
+              } else {
+                resolve();
+              }
+            }, ms);
+          }).then(() => Sk.builtin.none.none$)
+        );
+      });
+
+      // Додаємо все до глобальних builtin функцій
+      Sk.builtins['Pin'] = PinClass;
+      Sk.builtins['PWM'] = PWMClass;
+      Sk.builtins['sleep'] = sleepFunc;
+
+
+      try {
+        outputText('🚀 Початок виконання MicroPython програми...\n');
+        
+        // Перехоплення KeyboardInterrupt для зупинки while True циклів
+        const originalCode = code.replace(/while\s+True\s*:/g, 'while not _stop_requested():');
+        const wrappedCode = `
+_stop_flag = False
+def _stop_requested():
+    return _stop_flag
+
+${originalCode}
+`;
+
+        // Додаємо функцію для зупинки циклу
+        Sk.builtins['_stop_requested'] = new Sk.builtin.func(function() {
+          return currentExecution && currentExecution.stopped ? 
+            Sk.builtin.bool.true$ : Sk.builtin.bool.false$;
+        });
+
+        await Sk.misceval.asyncToPromise(() => 
+          Sk.importMainWithBody("__main__", false, wrappedCode, true)
+        );
+        
+        if (!currentExecution.stopped) {
+          outputText('\n✅ Програма завершена успішно!');
+        } else {
+          outputText('\n⏹️ Програма зупинена користувачем');
+        }
+      } catch (err) {
+        console.error(err);
+        if (err.toString().includes('ExternalError')) {
+          outputText('⏹️ Програма зупинена');
+        } else {
+          outputText('❌ Помилка виконання: ' + err.toString());
+        }
+      } finally {
+        updateUI(false);
+      }
+    }
+
+    // Ініціалізація статусу сервоприводів
+    document.addEventListener('DOMContentLoaded', function() {
+      updateUI(false);
+      for (let i = 0; i < 3; i++) {
+        updateServoStatus(i, 0);
+      }
+    });
+  </script>
+</body>
+</html>
