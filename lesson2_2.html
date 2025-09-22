@@ -422,6 +422,10 @@ async function runCode() {
       }
       return new Sk.builtin.int_(self.state ? 1 : 0);
     });
+    
+    // Додаємо константи для Pin режимів
+    $loc.OUT = new Sk.builtin.int_(1);
+    $loc.IN = new Sk.builtin.int_(0);
   }, 'Pin', []);
 
   // Створюємо PWM клас
@@ -452,11 +456,6 @@ async function runCode() {
       }
       return self.freq;
     });
-
-    // Додаємо константи для Pin режимів
-    $loc.OUT = new Sk.builtin.int_(1);
-    $loc.IN = new Sk.builtin.int_(0);
-    
   }, 'PWM', []);
 
   // Функція sleep з підтримкою зупинки
