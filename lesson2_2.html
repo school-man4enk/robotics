@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MicroPython редактор - Керування світлодіодом ESP32</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/0.11.1/skulpt.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/0.11.1/skulpt-stdlib.js"></script>
+  <style>
+    .code-editor {
+      font-family: 'Courier New', monospace;
+      tab-size: 4;
+    }
+    .line-numbers {
+      background: #f8f9fa;
+      color: #6c757d;
+      border-right: 1px solid #dee2e6;
+      user-select: none;
+      font-family: 'Courier New', monospace;
+    }
+    .syntax-highlight {
+      color: #0066cc;
+    }
+    .comment {
+      color: #6a9955;
+    }
+    .string {
+      color: #d14;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 font-sans min-h-screen">
+
+  <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 shadow-lg">
+    <div class="max-w-6xl mx-auto">
+      <h1 class="text-3xl font-bold text-center">💻 MicroPython редактор для ESP32</h1>
+      <p class="text-center text-sm mt-2 opacity-90">Керування світлодіодом - інтерактивне навчання</p>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto mt-6 p-6">
+    
+    <!-- Теоретична частина -->
+    <section class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-2xl font-semibold text-blue-700 mb-4 flex items-center">
+        <span class="mr-2">📚</span> Теорія
+      </h2>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="text-lg font-semibold mb-2">🧰 Необхідні компоненти:</h3>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>ESP32 мікроконтролер</li>
+            <li>Світлодіод (LED)</li>
+            <li>Резистор 220 Ом</li>
+            <li>Макетна плата та дроти</li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-2">⚡ Основні команди:</h3>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><code class="bg-gray-100 px-2 py-1 rounded">Pin(15, Pin.OUT)</code> - налаштування піна</li>
+            <li><code class="bg-gray-100 px-2 py-1 rounded">led.on()</code> - увімкнути світлодіод</li>
+            <li><code class="bg-gray-100 px-2 py-1 rounded">led.off()</code> - вимкнути світлодіод</li>
+            <li><code class="bg-gray-100 px-2 py-1 rounded">sleep(n)</code> - затримка n секунд</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Редактор коду -->
+    <section class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-2xl font-semibold text-blue-700 mb-4 flex items-center">
+        <span class="mr-2">👨‍💻</span> Редактор коду
+      </h2>
+      
+      <div class="flex flex-col lg:flex-row gap-6">
+        <!-- Код редактор -->
+        <div class="lg:w-1/2">
+          <div class="border rounded-lg overflow-hidden shadow-inner">
+            <div class="bg-gray-800 text-white px-4 py-2 text-sm font-medium flex justify-between items-center">
+              <span>📄 main.py</span>
+              <div class="space-x-2">
+                <button onclick="runCode()" class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-xs font-semibold transition-colors">
+                  ▶️ Запустити
+                </button>
+                <button onclick="stopCode()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-semibold transition-colors">
+                  ⏹️ Зупинити
+                </button>
+              </div>
+            </div>
+            <div class="flex">
+              <div class="line-numbers p-4 text-right text-sm leading-6" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br></div>
+              <textarea 
+                id="codeEditor" 
+                class="code-editor w-full p-4 border-0 focus:outline-none resize-none text-sm leading-6" 
+                rows="20"
+                placeholder="Введіть ваш MicroPython код тут..."
+                oninput="updateLineNumbers()"
+              >from machine import Pin
+from time import sleep
+
+led = Pin(15, Pin.OUT)
+
+while True:
+    led.on()   # Увімкнути світлодіод
+    sleep(1)   # Затримка 1 секунда
+    led.off()  # Вимкнути світлодіод
+    sleep(1)   # Затримка 1 секунда</textarea>
+            </div>
+          </div>
+          
+          <!-- Швидкі шаблони -->
+          <div class="mt-4">
+            <h3 class="font-semibold mb-2">⚡ Швидкі шаблони:</h3>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="loadTemplate('basic')" class="bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded text-sm transition-colors">
+                Базовий приклад
+              </button>
+              <button onclick="loadTemplate('blink')" class="bg-green-100 hover:bg-green-200 px-3 py-1 rounded text-sm transition-colors">
+                Блимання
+              </button>
+              <button onclick="loadTemplate('morse')" class="bg-purple-100 hover:bg-purple-200 px-3 py-1 rounded text-sm transition-colors">
+                Азбука Морзе (SOS)
+              </button>
+              <button onclick="loadTemplate('fade')" class="bg-orange-100 hover:bg-orange-200 px-3 py-1 rounded text-sm transition-colors">
+                PWM затемнення
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Симуляція ESP32 -->
+        <div class="lg:w-1/2">
+          <div class="bg-gray-900 rounded-lg p-6 text-white">
+            <h3 class="font-semibold mb-4 flex items-center">
+              <span class="mr-2">🔬</span> Симуляція ESP32
+            </h3>
+            
+            <!-- ESP32 Board Visualization -->
+            <div class="bg-gray-800 rounded-lg p-4 mb-4 relative">
+              <div class="text-center mb-4">
+                <div class="inline-block bg-blue-600 px-4 py-2 rounded text-sm font-mono">ESP32</div>
+              </div>
+              
+              <!-- GPIO 15 Pin -->
+              <div class="flex items-center justify-center mb-4">
+                <div class="text-xs mr-2">GPIO 15</div>
+                <div class="w-4 h-4 bg-yellow-500 rounded-full" id="gpio15"></div>
+                <div class="mx-2">—</div>
+                <!-- LED Visualization -->
+                <div class="relative">
+                  <div class="w-8 h-8 rounded-full border-2 border-gray-400 flex items-center justify-center" id="ledVisual">
+                    <div class="w-4 h-4 rounded-full bg-gray-600 transition-all duration-300" id="ledLight"></div>
+                  </div>
+                  <div class="text-xs text-center mt-1">LED</div>
+                </div>
+                <div class="mx-2">—</div>
+                <div class="text-xs">GND</div>
+              </div>
+              
+              <!-- Status -->
+              <div class="text-center">
+                <div class="text-xs opacity-75">Стан:</div>
+                <div id="ledStatus" class="font-semibold">ВИМКНЕНО</div>
+              </div>
+            </div>
+            
+            <!-- Console Output -->
+            <div class="bg-black rounded p-3 h-32 overflow-y-auto font-mono text-sm" id="console">
+              <div class="text-green-400">MicroPython консоль готова...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Завдання та вправи -->
+    <section class="bg-white rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-semibold text-blue-700 mb-4 flex items-center">
+        <span class="mr-2">🎯</span> Завдання та вправи
+      </h2>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-blue-800 mb-2">📝 Завдання 1: Базове керування</h3>
+            <p class="text-sm">Створіть програму, яка вмикає світлодіод на 3 секунди, потім вимикає його на 2 секунди. Повторіть цикл 5 разів.</p>
+          </div>
+          
+          <div class="bg-green-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-green-800 mb-2">📝 Завдання 2: SOS сигнал</h3>
+            <p class="text-sm">Запрограмуйте світлодіод передавати сигнал SOS в азбуці Морзе: 3 короткі, 3 довгі, 3 короткі блимання.</p>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="bg-purple-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-purple-800 mb-2">📝 Завдання 3: Випадкове блимання</h3>
+            <p class="text-sm">Використайте модуль <code>urandom</code> для створення випадкових інтервалів блимання від 0.1 до 2 секунд.</p>
+          </div>
+          
+          <div class="bg-orange-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-orange-800 mb-2">📝 Завдання 4: PWM затемнення</h3>
+            <p class="text-sm">Використайте PWM для плавного зміни яскравості світлодіода від 0% до 100% і назад.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="mt-8 text-center">
+      <a href="#" class="text-blue-600 hover:underline">← Назад до списку уроків</a>
+    </div>
+
+  </main>
+
+  <footer class="text-center mt-10 p-4 text-sm text-gray-500">
+    &copy; 2025 Робототехніка. Інтерактивний MicroPython редактор
+  </footer>
+
+<script>
+let isRunning = false;
+let currentExecution = null;
+
+// Оновлення номерів рядків
+function updateLineNumbers() {
+  const textarea = document.getElementById('codeEditor');
+  const lineNumbers = document.getElementById('lineNumbers');
+  const lines = textarea.value.split('\n').length;
+  
+  let numbers = '';
+  for (let i = 1; i <= Math.max(lines, 10); i++) {
+    numbers += i + '<br>';
+  }
+  lineNumbers.innerHTML = numbers;
+}
+
+// Шаблони коду
+const templates = {
+  basic: `from machine import Pin
+from time import sleep
+
+led = Pin(15, Pin.OUT)
+
+led.on()   # Увімкнути світлодіод
+sleep(3)   # Затримка 3 секунди
+led.off()  # Вимкнути світлодіод`,
+
+  blink: `from machine import Pin
+from time import sleep
+
+led = Pin(15, Pin.OUT)
+
+while True:
+    led.on()   # Увімкнути світлодіод
+    sleep(1)   # Затримка 1 секунда
+    led.off()  # Вимкнути світлодіод
+    sleep(1)   # Затримка 1 секунда`,
+
+  morse: `from machine import Pin
+from time import sleep
+
+led = Pin(15, Pin.OUT)
+
+def short_blink():
+    led.on()
+    sleep(0.2)
+    led.off()
+    sleep(0.2)
+
+def long_blink():
+    led.on()
+    sleep(0.6)
+    led.off()
+    sleep(0.2)
+
+# SOS сигнал
+for repeat in range(3):
+    # S (3 короткі)
+    for i in range(3):
+        short_blink()
+    
+    sleep(0.4)
+    
+    # O (3 довгі)
+    for i in range(3):
+        long_blink()
+    
+    sleep(0.4)
+    
+    # S (3 короткі)
+    for i in range(3):
+        short_blink()
+    
+    sleep(2)  # Пауза між повтореннями`,
+
+  fade: `from machine import Pin, PWM
+from time import sleep
+
+led = PWM(Pin(15), 1000)
+
+for cycle in range(3):
+    # Плавне увімкнення
+    for duty in range(0, 1024, 50):
+        led.duty(duty)
+        sleep(0.05)
+    
+    # Плавне вимкнення
+    for duty in range(1023, -1, -50):
+        led.duty(duty)
+        sleep(0.05)`
+};
+
+function loadTemplate(templateName) {
+  document.getElementById('codeEditor').value = templates[templateName];
+  updateLineNumbers();
+  logToConsole(`Завантажено шаблон: ${templateName}`);
+}
+
+function logToConsole(message) {
+  const console = document.getElementById('console');
+  console.innerHTML += `<div class="text-green-400">${message}</div>`;
+  console.scrollTop = console.scrollHeight;
+}
+
+function clearConsole() {
+  document.getElementById('console').innerHTML = '<div class="text-green-400">MicroPython консоль готова...</div>';
+}
+
+function updateLED(state, brightness = 100) {
+  const ledLight = document.getElementById('ledLight');
+  const ledStatus = document.getElementById('ledStatus');
+  
+  if (state) {
+    ledLight.style.backgroundColor = `rgba(255, 255, 0, ${brightness/100})`;
+    ledLight.style.boxShadow = `0 0 20px rgba(255, 255, 0, ${brightness/100})`;
+    ledStatus.textContent = 'УВІМКНЕНО';
+    ledStatus.style.color = '#10B981';
+  } else {
+    ledLight.style.backgroundColor = '#4B5563';
+    ledLight.style.boxShadow = 'none';
+    ledStatus.textContent = 'ВИМКНЕНО';
+    ledStatus.style.color = '#6B7280';
+  }
+}
+
+function updateUI(running) {
+  isRunning = running;
+  const runBtn = document.querySelector('button[onclick="runCode()"]');
+  const stopBtn = document.querySelector('button[onclick="stopCode()"]');
+  
+  runBtn.disabled = running;
+  stopBtn.disabled = !running;
+  
+  if (running) {
+    runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    stopBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+  } else {
+    runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    stopBtn.classList.add('opacity-50', 'cursor-not-allowed');
+  }
+}
+
+async function runCode() {
+  if (isRunning) return;
+  
+  updateUI(true);
+  clearConsole();
+  
+  const code = document.getElementById('codeEditor').value;
+  currentExecution = { stopped: false };
+
+  // Налаштування Skulpt
+  Sk.configure({
+    output: function(text) {
+      logToConsole(text);
+    },
+    read: function(filename) {
+      if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][filename] === undefined)
+        throw "File not found: '" + filename + "'";
+      return Sk.builtinFiles["files"][filename];
+    },
+    execLimit: 50000,
+    syspath: [],
+    __future__: Sk.python3,
+    python3: true
+  });
+
+  // Створюємо Pin клас
+  const PinClass = Sk.misceval.buildClass(new Sk.builtin.module(), function($gbl, $loc) {
+    $loc.__init__ = new Sk.builtin.func(function(self, pin_num, mode) {
+      self.pin_num = pin_num;
+      self.mode = mode;
+      self.state = false;
+      self.pwm_mode = false;
+      logToConsole(`Pin ${Sk.ffi.remapToJs(pin_num)} ініціалізовано як ${Sk.ffi.remapToJs(mode) === 1 ? 'OUTPUT' : 'INPUT'}`);
+      return Sk.builtin.none.none$;
+    });
+    
+    $loc.on = new Sk.builtin.func(function(self) {
+      self.state = true;
+      logToConsole(`Pin ${Sk.ffi.remapToJs(self.pin_num)} увімкнено`);
+      updateLED(true);
+      return Sk.builtin.none.none$;
+    });
+    
+    $loc.off = new Sk.builtin.func(function(self) {
+      self.state = false;
+      logToConsole(`Pin ${Sk.ffi.remapToJs(self.pin_num)} вимкнено`);
+      updateLED(false);
+      return Sk.builtin.none.none$;
+    });
+    
+    $loc.value = new Sk.builtin.func(function(self, val) {
+      if (val !== undefined) {
+        self.state = Sk.ffi.remapToJs(val) ? true : false;
+        updateLED(self.state);
+        logToConsole(`Pin ${Sk.ffi.remapToJs(self.pin_num)} встановлено в ${self.state ? 'HIGH' : 'LOW'}`);
+      }
+      return new Sk.builtin.int_(self.state ? 1 : 0);
+    });
+  }, 'Pin', []);
+
+  // Створюємо PWM клас
+  const PWMClass = Sk.misceval.buildClass(new Sk.builtin.module(), function($gbl, $loc) {
+    $loc.__init__ = new Sk.builtin.func(function(self, pin, freq) {
+      self.pin = pin;
+      self.freq = freq || new Sk.builtin.int_(1000);
+      self.duty_val = 0;
+      pin.pwm_mode = true;
+      logToConsole(`PWM ініціалізовано на піні ${Sk.ffi.remapToJs(pin.pin_num)} з частотою ${Sk.ffi.remapToJs(self.freq)} Hz`);
+      return Sk.builtin.none.none$;
+    });
+    
+    $loc.duty = new Sk.builtin.func(function(self, duty_value) {
+      if (duty_value !== undefined) {
+        self.duty_val = Sk.ffi.remapToJs(duty_value);
+        const brightness = (self.duty_val / 1023) * 100;
+        logToConsole(`PWM duty встановлено: ${self.duty_val} (${brightness.toFixed(1)}%)`);
+        updateLED(self.duty_val > 0, brightness);
+      }
+      return new Sk.builtin.int_(self.duty_val);
+    });
+    
+    $loc.freq = new Sk.builtin.func(function(self, freq_value) {
+      if (freq_value !== undefined) {
+        self.freq = freq_value;
+        logToConsole(`PWM частота встановлена: ${Sk.ffi.remapToJs(freq_value)} Hz`);
+      }
+      return self.freq;
+    });
+  }, 'PWM', []);
+
+  // Функція sleep з підтримкою зупинки
+  const sleepFunc = new Sk.builtin.func(function(seconds) {
+    const s = Sk.ffi.remapToJs(seconds);
+    const ms = Math.max(0, s * 1000);
+    
+    return Sk.misceval.promiseToSuspension(
+      new Promise(resolve => {
+        if (currentExecution && currentExecution.stopped) {
+          resolve();
+          return;
+        }
+        
+        logToConsole(`Пауза ${s} сек...`);
+        setTimeout(() => {
+          resolve();
+        }, ms);
+      }).then(() => Sk.builtin.none.none$)
+    );
+  });
+
+  // Функція для зупинки нескінченних циклів
+  const stopRequestedFunc = new Sk.builtin.func(function() {
+    return currentExecution && currentExecution.stopped ? 
+      Sk.builtin.bool.true$ : Sk.builtin.bool.false$;
+  });
+
+  // Додаємо константи для Pin режимів
+  PinClass.OUT = new Sk.builtin.int_(1);
+  PinClass.IN = new Sk.builtin.int_(0);
+
+  // Додаємо все до builtin модулів
+  Sk.builtins['Pin'] = PinClass;
+  Sk.builtins['PWM'] = PWMClass;
+  Sk.builtins['sleep'] = sleepFunc;
+  Sk.builtins['_stop_requested'] = stopRequestedFunc;
+
+  try {
+    logToConsole('🚀 Початок виконання MicroPython програми...');
+    
+    // Модифікуємо код для підтримки зупинки нескінченних циклів
+    let modifiedCode = code.replace(/while\s+True\s*:/g, 'while not _stop_requested():');
+    
+    await Sk.misceval.asyncToPromise(() => 
+      Sk.importMainWithBody("__main__", false, modifiedCode, true)
+    );
+    
+    if (!currentExecution.stopped) {
+      logToConsole('✅ Програма завершена успішно!');
+    } else {
+      logToConsole('⏹️ Програма зупинена користувачем');
+    }
+  } catch (err) {
+    if (currentExecution && currentExecution.stopped) {
+      logToConsole('⏹️ Програма зупинена');
+    } else {
+      logToConsole('❌ Помилка виконання: ' + err.toString());
+    }
+  } finally {
+    updateUI(false);
+  }
+}
+
+function stopCode() {
+  if (currentExecution) {
+    currentExecution.stopped = true;
+  }
+  updateLED(false);
+  updateUI(false);
+  logToConsole('⏹️ Зупинка програми...');
+}
+
+// Ініціалізація
+document.addEventListener('DOMContentLoaded', function() {
+  updateLineNumbers();
+  updateUI(false);
+});
+</script>
+
+</body>
+</html>
