@@ -176,7 +176,7 @@ while True:
                 <!-- ESP32 Board -->
                 <g id="esp32-board">
                   <!-- Board outline -->
-                  <rect x="220" y="30" width="160" height="220" fill="#1a1a2e" stroke="#3b82f6" stroke-width="2" rx="5"/>
+                  <rect x="220" y="30" width="160" height="255" fill="#1a1a2e" stroke="#3b82f6" stroke-width="2" rx="5"/>
                   
                   <!-- USB connector -->
                   <rect x="285" y="25" width="30" height="10" fill="#c0c0c0" stroke="#888" stroke-width="1" rx="2"/>
@@ -205,6 +205,7 @@ while True:
                     <rect x="218" y="225" width="8" height="4" fill="#fbbf24"/>
                     <rect x="218" y="240" width="8" height="4" fill="#fbbf24"/>
                     <rect x="218" y="255" width="8" height="4" fill="#fbbf24"/>
+                    <rect x="218" y="270" width="8" height="4" fill="#fbbf24"/>
                   </g>
                   
                   <!-- GPIO pins (right side) -->
@@ -223,6 +224,7 @@ while True:
                     <rect x="374" y="225" width="8" height="4" fill="#fbbf24"/>
                     <rect x="374" y="240" width="8" height="4" fill="#fbbf24"/>
                     <rect x="374" y="255" width="8" height="4" fill="#fbbf24"/>
+                    <rect x="374" y="270" width="8" height="4" fill="#fbbf24"/>
                   </g>
                   
                   <!-- LED indicator on board -->
@@ -230,21 +232,21 @@ while True:
                   
                   <!-- Labels -->
                   <g id="pin-labels">
-                    <text x="245" y="64" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">3.3V</text>
-                    <text x="245" y="79" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GND</text>
-                    <text x="245" y="94" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO15</text>
-                    <text x="245" y="109" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO2</text>
-                    <text x="245" y="124" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO4</text>
-                    <text x="245" y="139" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO16</text>
-                    <text x="245" y="154" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO17</text>
-                    <text x="245" y="169" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO5</text>
-                    <text x="245" y="184" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO18</text>
-                    <text x="245" y="199" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO19</text>
-                    <text x="245" y="214" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO21</text>
-                    <text x="245" y="229" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">RX</text>
-                    <text x="245" y="244" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">TX</text>
-                    <text x="245" y="259" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO22</text>
-                    <text x="245" y="274" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO23</text>
+                    <text x="227" y="64" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">3.3V</text>
+                    <text x="227" y="79" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GND</text>
+                    <text x="227" y="94" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO15</text>
+                    <text x="227" y="109" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO2</text>
+                    <text x="227" y="124" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO4</text>
+                    <text x="227" y="139" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO16</text>
+                    <text x="227" y="154" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO17</text>
+                    <text x="227" y="169" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO5</text>
+                    <text x="227" y="184" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO18</text>
+                    <text x="227" y="199" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO19</text>
+                    <text x="227" y="214" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO21</text>
+                    <text x="227" y="229" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">RX</text>
+                    <text x="227" y="244" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">TX</text>
+                    <text x="227" y="259" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO22</text>
+                    <text x="227" y="274" text-anchor="start" fill="#a78bfa" font-size="8" font-family="monospace">GPIO23</text>
                     <text x="395" y="214" text-anchor="start" fill="#64748b" font-size="8" font-family="monospace">5V</text>
                   </g>
                 </g>
@@ -303,13 +305,13 @@ while True:
                 <!-- Wiring connections -->
                 <g id="wiring">
                   <!-- GPIO15 to LED (signal wire - orange) -->
-                  <path id="wire-gpio15" d="M 218 167 L 190 167 L 190 135 L 82 135" 
+                  <path id="wire-gpio15" d="M 218 92 L 190 92 L 190 135 L 82 135" 
                         stroke="#ff9800" stroke-width="3" fill="none" opacity="0.8"
                         stroke-linecap="round"/>
-                  <circle cx="218" cy="167" r="3" fill="#ff9800"/>
+                  <circle cx="218" cy="92" r="3" fill="#ff9800"/>
                   
                   <!-- GND wire (black) -->
-                  <path id="wire-gnd" d="M 374 212 L 395 212 L 395 240 L 30 240 L 30 167 L 70 167" 
+                  <path id="wire-gnd" d="M 218 77 L 30 77 L 30 167 L 70 167" 
                         stroke="#1e293b" stroke-width="3" fill="none" opacity="0.8"
                         stroke-linecap="round"/>
                   <circle cx="374" cy="212" r="3" fill="#1e293b"/>
@@ -317,7 +319,7 @@ while True:
                 
                 <!-- Labels -->
                 <text x="150" y="130" fill="#ff9800" font-size="10" font-weight="bold">GPIO15</text>
-                <text x="200" y="245" text-anchor="middle" fill="#1e293b" font-size="10" font-weight="bold">GND</text>
+                <text x="150" y="115" text-anchor="middle" fill="#1e293b" font-size="10" font-weight="bold">GND</text>
                 
                 <!-- Gradient definitions -->
                 <defs>
