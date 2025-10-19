@@ -319,7 +319,7 @@ while True:
                 
                 <!-- Labels -->
                 <text x="150" y="130" fill="#ff9800" font-size="10" font-weight="bold">GPIO15</text>
-                <text x="150" y="80" text-anchor="middle" fill="#9baecf" font-size="10" font-weight="bold">GND</text>
+                <text x="150" y="77" text-anchor="middle" fill="#9baecf" font-size="10" font-weight="bold">GND</text>
                 
                 <!-- Gradient definitions -->
                 <defs>
@@ -499,7 +499,7 @@ function clearConsole() {
   document.getElementById('console').innerHTML = '<div class="text-green-400">MicroPython консоль готова...</div>';
 }
 
-function updateLED(state, brightness = 100) {
+function updateLED(state, pin, brightness = 100) {
   const ledCore = document.getElementById('led-core');
   const ledGlow = document.getElementById('led-glow');
   const ledPulse = document.getElementById('led-pulse');
@@ -508,7 +508,7 @@ function updateLED(state, brightness = 100) {
   const wireGpio15 = document.getElementById('wire-gpio15');
   const wireGnd = document.getElementById('wire-gnd');
   
-  if (state) {
+  if (state && pin === 15){
     // LED активний
     const yellowColor = `rgb(${255}, ${255}, ${Math.floor(100 * (brightness/100))})`;
     ledCore.style.fill = yellowColor;
@@ -612,21 +612,21 @@ async function runCode() {
     $loc.on = new Sk.builtin.func(function(self) {
       self.state = true;
       logToConsole(`Pin ${Sk.ffi.remapToJs(self.pin_num)} увімкнено`);
-      updateLED(true);
+      updateLED(true, Sk.ffi.remapToJs(self.pin_num));
       return Sk.builtin.none.none$;
     });
     
     $loc.off = new Sk.builtin.func(function(self) {
       self.state = false;
       logToConsole(`Pin ${Sk.ffi.remapToJs(self.pin_num)} вимкнено`);
-      updateLED(false);
+      updateLED(false, Sk.ffi.remapToJs(self.pin_num));
       return Sk.builtin.none.none$;
     });
     
     $loc.value = new Sk.builtin.func(function(self, val) {
       if (val !== undefined) {
         self.state = Sk.ffi.remapToJs(val) ? true : false;
-        updateLED(self.state);
+        updateLED(self.state, Sk.ffi.remapToJs(self.pin_num));
         logToConsole(`Pin ${Sk.ffi.remapToJs(self.pin_num)} встановлено в ${self.state ? 'HIGH' : 'LOW'}`);
       }
       return new Sk.builtin.int_(self.state ? 1 : 0);
@@ -653,7 +653,7 @@ async function runCode() {
         self.duty_val = Sk.ffi.remapToJs(duty_value);
         const brightness = (self.duty_val / 1023) * 100;
         logToConsole(`PWM duty встановлено: ${self.duty_val} (${brightness.toFixed(1)}%)`);
-        updateLED(self.duty_val > 0, brightness);
+        updateLED(self.duty_val > 0,Sk.ffi.remapToJs(self.pin_num), brightness);
       }
       return new Sk.builtin.int_(self.duty_val);
     });
