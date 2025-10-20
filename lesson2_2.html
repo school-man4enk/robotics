@@ -290,8 +290,8 @@ while True:
                   <circle id="led-core" cx="70" cy="135" r="6" fill="#4b5563" style="transition: all 0.3s;"/>
                   
                   <!-- LED legs -->
-                  <line x1="70" y1="150" x2="70" y2="165" stroke="#94a3b8" stroke-width="2"/>
-                  <line x1="70" y1="150" x2="85" y2="165" stroke="#94a3b8" stroke-width="2"/>
+                  <line x1="75" y1="140" x2="85" y2="140" stroke="#94a3b8" stroke-width="2"></line>
+                  <line x1="75" y1="130" x2="90" y2="130" stroke="#94a3b8" stroke-width="2"></line>
                   
                   <!-- Resistor -->
                   <rect x="75" y="163" width="20" height="8" fill="#d4a373" stroke="#8b6f47" stroke-width="1" rx="2"/>
@@ -305,13 +305,13 @@ while True:
                 <!-- Wiring connections -->
                 <g id="wiring">
                   <!-- GPIO15 to LED (signal wire - orange) -->
-                  <path id="wire-gpio15" d="M 218 92 L 190 92 L 190 135 L 82 135" 
+                  <path id="wire-gpio15" d="M 218 92 L 190 92 L 190 130 L 82 130" 
                         stroke="#ff9800" stroke-width="3" fill="none" opacity="0.8"
                         stroke-linecap="round"/>
                   <circle cx="218" cy="92" r="3" fill="#ff9800"/>
                   
                   <!-- GND wire (black) -->
-                  <path id="wire-gnd" d="M 218 77 L 30 77 L 30 167 L 70 167" 
+                  <path id="wire-gnd" d="M 218 77 L 30 77 L 30 167 L 100 167 L 100 140 L 85 140" 
                         stroke="#9baecf" stroke-width="3" fill="none" opacity="0.8"
                         stroke-linecap="round"/>
                   <circle cx="374" cy="212" r="3" fill="#9baecf"/>

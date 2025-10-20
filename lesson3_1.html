@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MicroPython редактор - Гірлянда світлодіодів ESP32</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/0.11.1/skulpt.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/0.11.1/skulpt-stdlib.js"></script>
+  <style>
+    .code-editor {
+      font-family: 'Courier New', monospace;
+      tab-size: 4;
+    }
+    .line-numbers {
+      background: #f8f9fa;
+      color: #6c757d;
+      border-right: 1px solid #dee2e6;
+      user-select: none;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .led-glow {
+      transition: all 0.3s ease-in-out;
+      filter: drop-shadow(0 0 3px currentColor);
+    }
+    
+    @keyframes wire-pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    
+    .wire-active {
+      animation: wire-pulse 1.5s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 font-sans min-h-screen">
+
+  <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 shadow-lg">
+    <div class="max-w-6xl mx-auto">
+      <h1 class="text-3xl font-bold text-center">🌈 MicroPython редактор - Гірлянда світлодіодів</h1>
+      <p class="text-center text-sm mt-2 opacity-90">Створення світлових ефектів з ESP32</p>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto mt-6 p-6">
+    
+    <!-- Теоретична частина -->
+    <section class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-2xl font-semibold text-blue-700 mb-4 flex items-center">
+        <span class="mr-2">📚</span> Теорія
+      </h2>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="text-lg font-semibold mb-2">🧰 Необхідні компоненти:</h3>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>ESP32 мікроконтролер</li>
+            <li>8 світлодіодів (LED)</li>
+            <li>8 резисторів 220 Ом</li>
+            <li>Макетна плата та дроти</li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-2">⚡ GPIO піни:</h3>
+          <ul class="list-disc pl-5 space-y-1 text-sm">
+            <li>LED 1 → <code class="bg-gray-100 px-2 py-1 rounded">GPIO15</code></li>
+            <li>LED 2 → <code class="bg-gray-100 px-2 py-1 rounded">GPIO2</code></li>
+            <li>LED 3 → <code class="bg-gray-100 px-2 py-1 rounded">GPIO4</code></li>
+            <li>LED 4 → <code class="bg-gray-100 px-2 py-1 rounded">GPIO16</code></li>
+            <li>LED 5 → <code class="bg-gray-100 px-2 py-1 rounded">GPIO17</code></li>
+            <li>LED 6 → <code class="bg-gray-100 px-2 py-1 rounded">GPIO5</code></li>
+            <li>LED 7 → <code class="bg-gray-100 px-2 py-1 rounded">GPIO18</code></li>
+            <li>LED 8 → <code class="bg-gray-100 px-2 py-1 rounded">GPIO19</code></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Редактор коду -->
+    <section class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-2xl font-semibold text-blue-700 mb-4 flex items-center">
+        <span class="mr-2">👨‍💻</span> Редактор коду
+      </h2>
+      
+      <div class="flex flex-col lg:flex-row gap-6">
+        <!-- Код редактор -->
+        <div class="lg:w-1/2">
+          <div class="border rounded-lg overflow-hidden shadow-inner">
+            <div class="bg-gray-800 text-white px-4 py-2 text-sm font-medium flex justify-between items-center">
+              <span>📄 main.py</span>
+              <div class="space-x-2">
+                <button onclick="runCode()" class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-xs font-semibold transition-colors">
+                  ▶️ Запустити
+                </button>
+                <button onclick="stopCode()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-semibold transition-colors">
+                  ⏹️ Зупинити
+                </button>
+              </div>
+            </div>
+            <div class="flex">
+              <div class="line-numbers p-4 text-right text-sm leading-6" id="lineNumbers"></div>
+              <textarea 
+                id="codeEditor" 
+                class="code-editor w-full p-4 border-0 focus:outline-none resize-none text-sm leading-6" 
+                rows="22"
+                placeholder="Введіть ваш MicroPython код тут..."
+                oninput="updateLineNumbers()"
+              >#from machine import Pin
+#from time import sleep
+
+leds = [
+    Pin(15, Pin.OUT),
+    Pin(2, Pin.OUT),
+    Pin(4, Pin.OUT),
+    Pin(16, Pin.OUT),
+    Pin(17, Pin.OUT),
+    Pin(5, Pin.OUT),
+    Pin(18, Pin.OUT),
+    Pin(19, Pin.OUT)
+]
+
+while True:
+    for led in leds:
+        led.on()
+        sleep(0.1)
+        led.off()</textarea>
+            </div>
+          </div>
+          
+          <!-- Швидкі шаблони -->
+          <div class="mt-4">
+            <h3 class="font-semibold mb-2">⚡ Швидкі шаблони:</h3>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="loadTemplate('running')" class="bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded text-sm transition-colors">
+                Біжучий вогник →
+              </button>
+              <button onclick="loadTemplate('running_back')" class="bg-green-100 hover:bg-green-200 px-3 py-1 rounded text-sm transition-colors">
+                Біжучий вогник ←
+              </button>
+              <button onclick="loadTemplate('blink_all')" class="bg-purple-100 hover:bg-purple-200 px-3 py-1 rounded text-sm transition-colors">
+                Мигання всіх
+              </button>
+              <button onclick="loadTemplate('wave')" class="bg-orange-100 hover:bg-orange-200 px-3 py-1 rounded text-sm transition-colors">
+                Хвиля
+              </button>
+              <button onclick="loadTemplate('alternate')" class="bg-pink-100 hover:bg-pink-200 px-3 py-1 rounded text-sm transition-colors">
+                Парні/Непарні
+              </button>
+              <button onclick="loadTemplate('random')" class="bg-yellow-100 hover:bg-yellow-200 px-3 py-1 rounded text-sm transition-colors">
+                Випадкові
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Симуляція ESP32 -->
+        <div class="lg:w-1/2">
+          <div class="bg-gray-900 rounded-lg p-6 text-white">
+            <h3 class="font-semibold mb-4 flex items-center">
+              <span class="mr-2">🔬</span> Симуляція ESP32
+            </h3>
+            
+            <!-- ESP32 Board Visualization -->
+            <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg p-4 mb-4 relative overflow-hidden">
+              <!-- Background circuit pattern -->
+              <div class="absolute inset-0 opacity-5" style="background-image: repeating-linear-gradient(0deg, transparent, transparent 10px, #3b82f6 10px, #3b82f6 11px), repeating-linear-gradient(90deg, transparent, transparent 10px, #3b82f6 10px, #3b82f6 11px);"></div>
+              
+              <svg width="100%" height="500" viewBox="0 0 500 500" style="max-width: 100%;">
+                <!-- ESP32 Board -->
+                <g id="esp32-board">
+                  <rect x="330" y="50" width="150" height="400" fill="#1a1a2e" stroke="#3b82f6" stroke-width="2" rx="5"/>
+                  <rect x="385" y="45" width="40" height="10" fill="#c0c0c0" stroke="#888" stroke-width="1" rx="2"/>
+                  <rect x="360" y="120" width="90" height="70" fill="#2d3748" stroke="#4a5568" stroke-width="1" rx="3"/>
+                  <text x="405" y="160" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="monospace">ESP32</text>
+                  
+                  <!-- GPIO pins labels -->
+                  <text x="325" y="100" text-anchor="end" fill="#ff9800" font-size="9" font-family="monospace">GPIO15</text>
+                  <text x="325" y="130" text-anchor="end" fill="#4caf50" font-size="9" font-family="monospace">GPIO2</text>
+                  <text x="325" y="160" text-anchor="end" fill="#2196f3" font-size="9" font-family="monospace">GPIO4</text>
+                  <text x="325" y="190" text-anchor="end" fill="#9c27b0" font-size="9" font-family="monospace">GPIO16</text>
+                  <text x="325" y="220" text-anchor="end" fill="#f44336" font-size="9" font-family="monospace">GPIO17</text>
+                  <text x="325" y="250" text-anchor="end" fill="#00bcd4" font-size="9" font-family="monospace">GPIO5</text>
+                  <text x="325" y="280" text-anchor="end" fill="#ffeb3b" font-size="9" font-family="monospace">GPIO18</text>
+                  <text x="325" y="310" text-anchor="end" fill="#ff5722" font-size="9" font-family="monospace">GPIO19</text>
+                  <text x="325" y="340" text-anchor="end" fill="#607d8b" font-size="9" font-family="monospace">GND</text>
+                  
+                  <!-- GPIO pins -->
+                  <rect id="pin-15" x="328" y="96" width="8" height="4" fill="#fbbf24"/>
+                  <rect id="pin-2" x="328" y="126" width="8" height="4" fill="#fbbf24"/>
+                  <rect id="pin-4" x="328" y="156" width="8" height="4" fill="#fbbf24"/>
+                  <rect id="pin-16" x="328" y="186" width="8" height="4" fill="#fbbf24"/>
+                  <rect id="pin-17" x="328" y="216" width="8" height="4" fill="#fbbf24"/>
+                  <rect id="pin-5" x="328" y="246" width="8" height="4" fill="#fbbf24"/>
+                  <rect id="pin-18" x="328" y="276" width="8" height="4" fill="#fbbf24"/>
+                  <rect id="pin-19" x="328" y="306" width="8" height="4" fill="#fbbf24"/>
+                  <rect id="pin-gnd" x="328" y="336" width="8" height="4" fill="#9baecf"/>
+                </g>
+                
+                <!-- LED Strip -->
+                <g id="led-strip">
+                  <!-- LED 1 - GPIO15 -->
+                  <g id="led-1">
+                    <ellipse cx="80" cy="98" rx="12" ry="15" fill="url(#ledGradient)" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle id="led-core-1" cx="80" cy="98" r="8" fill="#4b5563"/>
+                    <circle id="led-glow-1" cx="80" cy="98" r="12" fill="#ff9800" opacity="0" class="led-glow"/>
+                    <line x1="80" y1="113" x2="80" y2="125" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="80" y1="113" x2="95" y2="125" stroke="#94a3b8" stroke-width="2"/>
+                    <rect x="85" y="123" width="20" height="8" fill="#d4a373" stroke="#8b6f47" stroke-width="1" rx="2"/>
+                    <path id="wire-1" d="M 328 98 L 200 98 L 200 98 L 92 98" stroke="#ff9800" stroke-width="2" fill="none" opacity="0.6"/>
+                  </g>
+                  
+                  <!-- LED 2 - GPIO2 -->
+                  <g id="led-2">
+                    <ellipse cx="80" cy="128" rx="12" ry="15" fill="url(#ledGradient)" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle id="led-core-2" cx="80" cy="128" r="8" fill="#4b5563"/>
+                    <circle id="led-glow-2" cx="80" cy="128" r="12" fill="#4caf50" opacity="0" class="led-glow"/>
+                    <line x1="80" y1="143" x2="80" y2="155" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="80" y1="143" x2="95" y2="155" stroke="#94a3b8" stroke-width="2"/>
+                    <rect x="85" y="153" width="20" height="8" fill="#d4a373" stroke="#8b6f47" stroke-width="1" rx="2"/>
+                    <path id="wire-2" d="M 328 128 L 205 128 L 205 128 L 92 128" stroke="#4caf50" stroke-width="2" fill="none" opacity="0.6"/>
+                  </g>
+                  
+                  <!-- LED 3 - GPIO4 -->
+                  <g id="led-3">
+                    <ellipse cx="80" cy="158" rx="12" ry="15" fill="url(#ledGradient)" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle id="led-core-3" cx="80" cy="158" r="8" fill="#4b5563"/>
+                    <circle id="led-glow-3" cx="80" cy="158" r="12" fill="#2196f3" opacity="0" class="led-glow"/>
+                    <line x1="80" y1="173" x2="80" y2="185" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="80" y1="173" x2="95" y2="185" stroke="#94a3b8" stroke-width="2"/>
+                    <rect x="85" y="183" width="20" height="8" fill="#d4a373" stroke="#8b6f47" stroke-width="1" rx="2"/>
+                    <path id="wire-3" d="M 328 158 L 210 158 L 210 158 L 92 158" stroke="#2196f3" stroke-width="2" fill="none" opacity="0.6"/>
+                  </g>
+                  
+                  <!-- LED 4 - GPIO16 -->
+                  <g id="led-4">
+                    <ellipse cx="80" cy="188" rx="12" ry="15" fill="url(#ledGradient)" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle id="led-core-4" cx="80" cy="188" r="8" fill="#4b5563"/>
+                    <circle id="led-glow-4" cx="80" cy="188" r="12" fill="#9c27b0" opacity="0" class="led-glow"/>
+                    <line x1="80" y1="203" x2="80" y2="215" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="80" y1="203" x2="95" y2="215" stroke="#94a3b8" stroke-width="2"/>
+                    <rect x="85" y="213" width="20" height="8" fill="#d4a373" stroke="#8b6f47" stroke-width="1" rx="2"/>
+                    <path id="wire-4" d="M 328 188 L 215 188 L 215 188 L 92 188" stroke="#9c27b0" stroke-width="2" fill="none" opacity="0.6"/>
+                  </g>
+                  
+                  <!-- LED 5 - GPIO17 -->
+                  <g id="led-5">
+                    <ellipse cx="80" cy="218" rx="12" ry="15" fill="url(#ledGradient)" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle id="led-core-5" cx="80" cy="218" r="8" fill="#4b5563"/>
+                    <circle id="led-glow-5" cx="80" cy="218" r="12" fill="#f44336" opacity="0" class="led-glow"/>
+                    <line x1="80" y1="233" x2="80" y2="245" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="80" y1="233" x2="95" y2="245" stroke="#94a3b8" stroke-width="2"/>
+                    <rect x="85" y="243" width="20" height="8" fill="#d4a373" stroke="#8b6f47" stroke-width="1" rx="2"/>
+                    <path id="wire-5" d="M 328 218 L 220 218 L 220 218 L 92 218" stroke="#f44336" stroke-width="2" fill="none" opacity="0.6"/>
+                  </g>
+                  
+                  <!-- LED 6 - GPIO5 -->
+                  <g id="led-6">
+                    <ellipse cx="80" cy="248" rx="12" ry="15" fill="url(#ledGradient)" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle id="led-core-6" cx="80" cy="248" r="8" fill="#4b5563"/>
+                    <circle id="led-glow-6" cx="80" cy="248" r="12" fill="#00bcd4" opacity="0" class="led-glow"/>
+                    <line x1="80" y1="263" x2="80" y2="275" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="80" y1="263" x2="95" y2="275" stroke="#94a3b8" stroke-width="2"/>
+                    <rect x="85" y="273" width="20" height="8" fill="#d4a373" stroke="#8b6f47" stroke-width="1" rx="2"/>
+                    <path id="wire-6" d="M 328 248 L 225 248 L 225 248 L 92 248" stroke="#00bcd4" stroke-width="2" fill="none" opacity="0.6"/>
+                  </g>
+                  
+                  <!-- LED 7 - GPIO18 -->
+                  <g id="led-7">
+                    <ellipse cx="80" cy="278" rx="12" ry="15" fill="url(#ledGradient)" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle id="led-core-7" cx="80" cy="278" r="8" fill="#4b5563"/>
+                    <circle id="led-glow-7" cx="80" cy="278" r="12" fill="#ffeb3b" opacity="0" class="led-glow"/>
+                    <line x1="80" y1="293" x2="80" y2="305" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="80" y1="293" x2="95" y2="305" stroke="#94a3b8" stroke-width="2"/>
+                    <rect x="85" y="303" width="20" height="8" fill="#d4a373" stroke="#8b6f47" stroke-width="1" rx="2"/>
+                    <path id="wire-7" d="M 328 278 L 230 278 L 230 278 L 92 278" stroke="#ffeb3b" stroke-width="2" fill="none" opacity="0.6"/>
+                  </g>
+                  
+                  <!-- LED 8 - GPIO19 -->
+                  <g id="led-8">
+                    <ellipse cx="80" cy="308" rx="12" ry="15" fill="url(#ledGradient)" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle id="led-core-8" cx="80" cy="308" r="8" fill="#4b5563"/>
+                    <circle id="led-glow-8" cx="80" cy="308" r="12" fill="#ff5722" opacity="0" class="led-glow"/>
+                    <line x1="80" y1="323" x2="80" y2="335" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="80" y1="323" x2="95" y2="335" stroke="#94a3b8" stroke-width="2"/>
+                    <rect x="85" y="333" width="20" height="8" fill="#d4a373" stroke="#8b6f47" stroke-width="1" rx="2"/>
+                    <path id="wire-8" d="M 328 308 L 235 308 L 235 308 L 92 308" stroke="#ff5722" stroke-width="2" fill="none" opacity="0.6"/>
+                  </g>
+                  
+                  <!-- Common GND wire -->
+                  <path d="M 105 135 L 105 320 M 105 320 L 240 320 L 240 338 L 328 338" stroke="#607d8b" stroke-width="2" fill="none" opacity="0.6"/>
+                </g>
+                
+                <!-- Gradient definitions -->
+                <defs>
+                  <radialGradient id="ledGradient">
+                    <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:0.9" />
+                    <stop offset="70%" style="stop-color:#e2e8f0;stop-opacity:0.6" />
+                    <stop offset="100%" style="stop-color:#cbd5e1;stop-opacity:0.8" />
+                  </radialGradient>
+                </defs>
+              </svg>
+              
+              <!-- Status indicator -->
+              <div class="mt-4 text-center">
+                <div class="text-xs opacity-75 mb-1">Статус гірлянди:</div>
+                <div id="garlandStatus" class="font-semibold text-base">Готова до роботи</div>
+              </div>
+            </div>
+            
+            <!-- Console Output -->
+            <div class="bg-black rounded p-3 h-32 overflow-y-auto font-mono text-sm" id="console">
+              <div class="text-green-400">MicroPython консоль готова...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Завдання та вправи -->
+    <section class="bg-white rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-semibold text-blue-700 mb-4 flex items-center">
+        <span class="mr-2">🎯</span> Завдання та вправи
+      </h2>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-blue-800 mb-2">📝 Завдання 1: Біжучий вогник</h3>
+            <p class="text-sm">Створіть ефект "біжучого вогника", коли світлодіоди засвічуються послідовно від першого до останнього.</p>
+          </div>
+          
+          <div class="bg-green-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-green-800 mb-2">📝 Завдання 2: Зворотній рух</h3>
+            <p class="text-sm">Модифікуйте код так, щоб після руху вперед вогник біг у зворотному напрямку.</p>
+          </div>
+          
+          <div class="bg-purple-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-purple-800 mb-2">📝 Завдання 3: Хвиля</h3>
+            <p class="text-sm">Створіть ефект хвилі: засвічуйте світлодіоди один за одним, але не гасіть попередні відразу.</p>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="bg-orange-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-orange-800 mb-2">📝 Завдання 4: Парні/Непарні</h3>
+            <p class="text-sm">Створіть ефект чергування: спочатку мигають парні світлодіоди, потім непарні.</p>
+          </div>
+          
+          <div class="bg-pink-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-pink-800 mb-2">📝 Завдання 5: Новий рік</h3>
+            <p class="text-sm">Розробіть складний сценарій святкової гірлянди з різними ефектами та переходами.</p>
+          </div>
+          
+          <div class="bg-yellow-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-yellow-800 mb-2">📝 Завдання 6: Випадкові спалахи</h3>
+            <p class="text-sm">Використайте випадкові числа для створення ефекту випадкових спалахів світлодіодів.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="mt-8 text-center">
+      <a href="index.html" class="text-blue-600 hover:underline">← Назад до списку уроків</a>
+    </div>
+
+  </main>
+
+  <footer class="text-center mt-10 p-4 text-sm text-gray-500">
+    &copy; 2025 Робототехніка. Інтерактивний MicroPython редактор
+  </footer>
+
+<script>
+let isRunning = false;
+let currentExecution = null;
+
+const LED_PINS = [15, 2, 4, 16, 17, 5, 18, 19];
+const LED_COLORS = ['#ff9800', '#4caf50', '#2196f3', '#9c27b0', '#f44336', '#00bcd4', '#ffeb3b', '#ff5722'];
+
+function updateLineNumbers() {
+  const textarea = document.getElementById('codeEditor');
+  const lineNumbers = document.getElementById('lineNumbers');
+  const lines = textarea.value.split('\n').length;
+  
+  let numbers = '';
+  for (let i = 1; i <= Math.max(lines, 10); i++) {
+    numbers += i + '<br>';
+  }
+  lineNumbers.innerHTML = numbers;
+}
+
+const templates = {
+  running: `#from machine import Pin
+#from time import sleep
+
+leds = [
+    Pin(15, Pin.OUT),
+    Pin(2, Pin.OUT),
+    Pin(4, Pin.OUT),
+    Pin(16, Pin.OUT),
+    Pin(17, Pin.OUT),
+    Pin(5, Pin.OUT),
+    Pin(18, Pin.OUT),
+    Pin(19, Pin.OUT)
+]
+
+while True:
+    for led in leds:
+        led.on()
+        sleep(0.1)
+        led.off()`,
+
+  running_back: `#from machine import Pin
+#from time import sleep
+
+leds = [
+    Pin(15, Pin.OUT),
+    Pin(2, Pin.OUT),
+    Pin(4, Pin.OUT),
+    Pin(16, Pin.OUT),
+    Pin(17, Pin.OUT),
+    Pin(5, Pin.OUT),
+    Pin(18, Pin.OUT),
+    Pin(19, Pin.OUT)
+]
+
+while True:
+    # Вперед
+    for led in leds:
+        led.on()
+        sleep(0.1)
+        led.off()
+    
+    # Назад
+    for led in reversed(leds):
+        led.on()
+        sleep(0.1)
+        led.off()`,
+
+  blink_all: `#from machine import Pin
+#from time import sleep
+
+leds = [
+    Pin(15, Pin.OUT),
+    Pin(2, Pin.OUT),
+    Pin(4, Pin.OUT),
+    Pin(16, Pin.OUT),
+    Pin(17, Pin.OUT),
+    Pin(5, Pin.OUT),
+    Pin(18, Pin.OUT),
+    Pin(19, Pin.OUT)
+]
+
+while True:
+    # Увімкнути всі
+    for led in leds:
+        led.on()
+    sleep(0.5)
+    
+    # Вимкнути всі
+    for led in leds:
+        led.off()
+    sleep(0.5)`,
+
+  wave: `#from machine import Pin
+#from time import sleep
+
+leds = [
+    Pin(15, Pin.OUT),
+    Pin(2, Pin.OUT),
+    Pin(4, Pin.OUT),
+    Pin(16, Pin.OUT),
+    Pin(17, Pin.OUT),
+    Pin(5, Pin.OUT),
+    Pin(18, Pin.OUT),
+    Pin(19, Pin.OUT)
+]
+
+while True:
+    # Хвиля вперед
+    for i in range(len(leds)):
+        leds[i].on()
+        sleep(0.1)
+    
+    # Згасання з затримкою
+    for i in range(len(leds)):
+        leds[i].off()
+        sleep(0.1)`,
+
+  alternate: `#from machine import Pin
+#from time import sleep
+
+leds = [
+    Pin(15, Pin.OUT),
+    Pin(2, Pin.OUT),
+    Pin(4, Pin.OUT),
+    Pin(16, Pin.OUT),
+    Pin(17, Pin.OUT),
+    Pin(5, Pin.OUT),
+    Pin(18, Pin.OUT),
+    Pin(19, Pin.OUT)
+]
+
+while True:
+    # Парні світлодіоди
+    for i in range(0, len(leds), 2):
+        leds[i].on()
+    sleep(0.5)
+    for i in range(0, len(leds), 2):
+        leds[i].off()
+    
+    # Непарні світлодіоди
+    for i in range(1, len(leds), 2):
+        leds[i].on()
+    sleep(0.5)
+    for i in range(1, len(leds), 2):
+        leds[i].off()`,
+
+  random: `#from machine import Pin
+#from time import sleep
+#import urandom
+
+leds = [
+    Pin(15, Pin.OUT),
+    Pin(2, Pin.OUT),
+    Pin(4, Pin.OUT),
+    Pin(16, Pin.OUT),
+    Pin(17, Pin.OUT),
+    Pin(5, Pin.OUT),
+    Pin(18, Pin.OUT),
+    Pin(19, Pin.OUT)
+]
+
+while True:
+    # Випадковий світлодіод
+    index = urandom.randint(0, len(leds) - 1)
+    leds[index].on()
+    sleep(0.2)
+    leds[index].off()
+    sleep(0.1)`
+};
+
+function loadTemplate(templateName) {
+  document.getElementById('codeEditor').value = templates[templateName];
+  updateLineNumbers();
+  logToConsole(`Завантажено шаблон: ${templateName}`);
+}
+
+function logToConsole(message) {
+  const console = document.getElementById('console');
+  console.innerHTML += `<div class="text-green-400">${message}</div>`;
+  console.scrollTop = console.scrollHeight;
+}
+
+function clearConsole() {
+  document.getElementById('console').innerHTML = '<div class="text-green-400">MicroPython консоль готова...</div>';
+}
+
+function updateLED(state, pin, brightness = 100) {
+  const pinIndex = LED_PINS.indexOf(pin);
+  if (pinIndex === -1) return;
+  
+  const ledNum = pinIndex + 1;
+  const ledCore = document.getElementById(`led-core-${ledNum}`);
+  const ledGlow = document.getElementById(`led-glow-${ledNum}`);
+  const wire = document.getElementById(`wire-${ledNum}`);
+  const pinEl = document.getElementById(`pin-${pin}`);
+  
+  if (state) {
+    const color = LED_COLORS[pinIndex];
+    ledCore.style.fill = color;
+    ledGlow.style.opacity = brightness / 100;
+    
+    if (wire) {
+      wire.style.opacity = '1';
+      wire.classList.add('wire-active');
+    }
+    if (pinEl) {
+      pinEl.style.filter = `drop-shadow(0 0 3px ${color})`;
+    }
+  } else {
+    ledCore.style.fill = '#4b5563';
+    ledGlow.style.opacity = 0;
+    
+    if (wire) {
+      wire.style.opacity = '0.6';
+      wire.classList.remove('wire-active');
+    }
+    if (pinEl) {
+      pinEl.style.filter = 'none';
+    }
+  }
+  
+  updateGarlandStatus();
+}
+
+function updateGarlandStatus() {
+  const statusEl = document.getElementById('garlandStatus');
+  let activeCount = 0;
+  
+  for (let i = 1; i <= 8; i++) {
+    const ledCore = document.getElementById(`led-core-${i}`);
+    if (ledCore && ledCore.style.fill !== '#4b5563' && ledCore.style.fill !== 'rgb(75, 85, 99)') {
+      activeCount++;
+    }
+  }
+  
+  if (activeCount === 0) {
+    statusEl.textContent = 'Готова до роботи';
+    statusEl.style.color = '#94a3b8';
+  } else if (activeCount === 8) {
+    statusEl.textContent = '🎉 Всі світлодіоди активні!';
+    statusEl.style.color = '#22c55e';
+  } else {
+    statusEl.textContent = `✨ Активно: ${activeCount}/8`;
+    statusEl.style.color = '#3b82f6';
+  }
+}
+
+function updateUI(running) {
+  isRunning = running;
+  const runBtn = document.querySelector('button[onclick="runCode()"]');
+  const stopBtn = document.querySelector('button[onclick="stopCode()"]');
+  
+  runBtn.disabled = running;
+  stopBtn.disabled = !running;
+  
+  if (running) {
+    runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    stopBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+  } else {
+    runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    stopBtn.classList.add('opacity-50', 'cursor-not-allowed');
+  }
+}
+
+async function runCode() {
+  if (isRunning) return;
+  
+  updateUI(true);
+  clearConsole();
+  
+  const code = document.getElementById('codeEditor').value;
+  currentExecution = { stopped: false };
+
+  Sk.configure({
+    output: function(text) {
+      logToConsole(text);
+    },
+    read: function(filename) {
+      if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][filename] === undefined)
+        throw "File not found: '" + filename + "'";
+      return Sk.builtinFiles["files"][filename];
+    },
+    execLimit: 50000,
+    syspath: [],
+    __future__: Sk.python3,
+    python3: true
+  });
+
+  const PinClass = Sk.misceval.buildClass(new Sk.builtin.module(), function($gbl, $loc) {
+    $loc.__init__ = new Sk.builtin.func(function(self, pin_num, mode) {
+      self.pin_num = pin_num;
+      self.mode = mode;
+      self.state = false;
+      const pinJs = Sk.ffi.remapToJs(pin_num);
+      logToConsole(`Pin ${pinJs} ініціалізовано`);
+      return Sk.builtin.none.none$;
+    });
+    
+    $loc.on = new Sk.builtin.func(function(self) {
+      self.state = true;
+      const pinJs = Sk.ffi.remapToJs(self.pin_num);
+      updateLED(true, pinJs);
+      return Sk.builtin.none.none$;
+    });
+    
+    $loc.off = new Sk.builtin.func(function(self) {
+      self.state = false;
+      const pinJs = Sk.ffi.remapToJs(self.pin_num);
+      updateLED(false, pinJs);
+      return Sk.builtin.none.none$;
+    });
+    
+    $loc.value = new Sk.builtin.func(function(self, val) {
+      if (val !== undefined) {
+        self.state = Sk.ffi.remapToJs(val) ? true : false;
+        updateLED(self.state, Sk.ffi.remapToJs(self.pin_num));
+      }
+      return new Sk.builtin.int_(self.state ? 1 : 0);
+    });
+    
+    $loc.OUT = new Sk.builtin.int_(1);
+    $loc.IN = new Sk.builtin.int_(0);
+  }, 'Pin', []);
+
+  const sleepFunc = new Sk.builtin.func(function(seconds) {
+    const s = Sk.ffi.remapToJs(seconds);
+    const ms = Math.max(0, s * 1000);
+    
+    return Sk.misceval.promiseToSuspension(
+      new Promise(resolve => {
+        if (currentExecution && currentExecution.stopped) {
+          resolve();
+          return;
+        }
+        setTimeout(() => {
+          resolve();
+        }, ms);
+      }).then(() => Sk.builtin.none.none$)
+    );
+  });
+
+  const stopRequestedFunc = new Sk.builtin.func(function() {
+    return currentExecution && currentExecution.stopped ? 
+      Sk.builtin.bool.true$ : Sk.builtin.bool.false$;
+  });
+
+  // urandom module
+  const urandomMod = function($gbl, $loc) {
+    $loc.randint = new Sk.builtin.func(function(a, b) {
+      const min = Sk.ffi.remapToJs(a);
+      const max = Sk.ffi.remapToJs(b);
+      const random = Math.floor(Math.random() * (max - min + 1)) + min;
+      return new Sk.builtin.int_(random);
+    });
+  };
+
+  Sk.builtins['Pin'] = PinClass;
+  Sk.builtins['sleep'] = sleepFunc;
+  Sk.builtins['_stop_requested'] = stopRequestedFunc;
+  Sk.sysmodules.mp$urandom = new Sk.builtin.module();
+  Sk.misceval.callsim(urandomMod, Sk.sysmodules.mp$urandom, Sk.sysmodules.mp$urandom.$d);
+
+  try {
+    logToConsole('🚀 Початок виконання програми гірлянди...');
+    
+    let modifiedCode = code.replace(/while\s+True\s*:/g, 'while not _stop_requested():');
+    
+    await Sk.misceval.asyncToPromise(() => 
+      Sk.importMainWithBody("__main__", false, modifiedCode, true)
+    );
+    
+    if (!currentExecution.stopped) {
+      logToConsole('✅ Програма завершена успішно!');
+    } else {
+      logToConsole('⏹️ Програма зупинена користувачем');
+    }
+  } catch (err) {
+    if (currentExecution && currentExecution.stopped) {
+      logToConsole('⏹️ Програма зупинена');
+    } else {
+      logToConsole('❌ Помилка виконання: ' + err.toString());
+    }
+  } finally {
+    updateUI(false);
+  }
+}
+
+function stopCode() {
+  if (currentExecution) {
+    currentExecution.stopped = true;
+  }
+  
+  LED_PINS.forEach(pin => updateLED(false, pin));
+  updateUI(false);
+  logToConsole('⏹️ Зупинка програми...');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  updateLineNumbers();
+  updateUI(false);
+  updateGarlandStatus();
+});
+</script>
+
+</body>
+</html>
