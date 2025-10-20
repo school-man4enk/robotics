@@ -409,8 +409,8 @@ function updateLineNumbers() {
 
 // Шаблони коду
 const templates = {
-  basic: `from machine import Pin
-from time import sleep
+  basic: `#from machine import Pin
+#from time import sleep
 
 led = Pin(15, Pin.OUT)
 
@@ -418,8 +418,8 @@ led.on()   # Увімкнути світлодіод
 sleep(3)   # Затримка 3 секунди
 led.off()  # Вимкнути світлодіод`,
 
-  blink: `from machine import Pin
-from time import sleep
+  blink: `#from machine import Pin
+#from time import sleep
 
 led = Pin(15, Pin.OUT)
 
@@ -429,8 +429,8 @@ while True:
     led.off()  # Вимкнути світлодіод
     sleep(1)   # Затримка 1 секунда`,
 
-  morse: `from machine import Pin
-from time import sleep
+  morse: `#from machine import Pin
+#from time import sleep
 
 led = Pin(15, Pin.OUT)
 
@@ -466,8 +466,8 @@ for repeat in range(3):
     
     sleep(2)  # Пауза між повтореннями`,
 
-  fade: `from machine import Pin, PWM
-from time import sleep
+  fade: `#from machine import Pin, PWM
+#from time import sleep
 
 led = PWM(Pin(15), 1000)
 
@@ -729,7 +729,7 @@ function stopCode() {
   if (currentExecution) {
     currentExecution.stopped = true;
   }
-  updateLED(false);
+  updateLED(false, 15);
   updateUI(false);
   logToConsole('⏹️ Зупинка програми...');
 }
